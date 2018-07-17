@@ -1,0 +1,11 @@
+node_modules/
+.idea/
+*.log
+
+build/
+dist/
+**/*.txt
+**/*.xml
+**/*.svg
+dll/
+.DS_Store
