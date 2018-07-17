@@ -7,7 +7,7 @@ Local port; 9009
 --------
 ##### Clone
 ```
-  git@github.com:NZMia/webpack_staging.git
+  git@github.com:NZMia/core-vue.git
 ```
 ##### Install
 ```
