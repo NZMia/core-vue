@@ -9,3 +9,4 @@ dist/
 **/*.svg
 dll/
 .DS_Store
+package-lock.json
