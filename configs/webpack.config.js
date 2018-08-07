@@ -1,10 +1,9 @@
-
 const webpack = require('webpack');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const { VueLoaderPlugin } = require('vue-loader');
+const VueLoaderPlugin = require('vue-loader/lib/plugin')
 
 const project = require('./project.config');
 
@@ -16,161 +15,143 @@ const SRC_DIR = path.join(project.basePath, project.srcDir);
 
 const config = {
 
-	mode: project.env,
+    mode: project.env,
 
-	entry:{
-		main: [SRC_DIR + '/main.js']
-	},
+    entry:{
+        main: [SRC_DIR + '/main.js']
+    },
 
-	output: {
-		path: path.resolve(project.basePath, project.outDir),
-		filename: envDev ? '[name].js' : '[name].[chunkhash:5].js',
-		publicPath: project.publicPath
-	},
+    output: {
+        path: path.resolve(project.basePath, project.outDir),
+        filename: envDev ? '[name].js' : '[name].[chunkhash:5].js',
+        publicPath: project.publicPath
+    },
 
-	devtool: devtool,
+    devtool: devtool,
 
-	resolve: {
-		modules: [
-			project.srcDir,
-			'node_modules'
-		],
+    resolve: {
+        modules: [
+            project.srcDir,
+            'node_modules'
+        ],
 
-		alias: {
-			'src': SRC_DIR
-		},
+        alias: {
+            'src': SRC_DIR
+        },
 
-		extensions: ['*','.js', '.jsx', '.json', '.less', '.scss', '.css']
-	},
+        extensions: ['*','.js', '.vue', '.json', '.less', '.scss', '.css']
+    },
 
-	module: {
-		rules: [
-			{
-				test: /\.vue$/,
-				use: 'vue-loader'
-			},
-			{
-				test: /(\.jsx|\.js)$/,
-				use : {
-					loader: 'babel-loader?cacheDirectory'
-				},
-				include: SRC_DIR,
-				exclude: /node_modules/
-			},
-			{
-				test:/\.(sa|sc|c)ss$/,
-				use :[
+    module: {
+        rules: [
+            {
+                test: /\.vue$/,
+                use: 'vue-loader'
+            },
+            {
+                test: /(\.jsx|\.js)$/,
+                use : {
+                    loader: 'babel-loader?cacheDirectory'
+                },
+                include: SRC_DIR,
+                exclude: /node_modules/
+            },
+            {
+                test:/\.(sa|sc|c)ss$/,
+                use :[
 
-					MiniCssExtractPlugin.loader,
-					{
-						loader : 'css-loader',
-					},
-					{
-						loader: 'postcss-loader',
-						options: {
-							config: {
-								path: path.join(project.basePath, 'postcss.config.js')
-							}
-						}
-					},
-					{
-						loader: 'sass-loader'
-					}
-				]
-			},
-			{
-				test    : /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-				loader  : 'url-loader',
-				options : {
-					limit     : 10000,
-					outputPath: "images"
-				}
-			}
-		]
-	},
+                    envDev ? 'vue-style-loader' : MiniCssExtractPlugin.loader,
+                    {
+                        loader : 'css-loader',
+                    },
+                    {
+                        loader: 'postcss-loader',
+                        options: {
+                            config: {
+                                path: path.join(project.basePath, 'postcss.config.js')
+                            }
+                        }
+                    },
+                    {
+                        loader: 'sass-loader'
+                    }
+                ]
+            },
+            {
+                test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
+                use: [{
+                    loader: "url-loader",
+                    options : {
+                        limit: 8192,
+                        name: 'images/[name].[hash:5].[ext]'
+                    }
+                }]
+            }
+        ]
+    },
 
-	optimization: {
-		sideEffects: false,
-		splitChunks: {
-			chunks     :'all',
-			minSize    : 30000,
-			minChunks  : 1,
-			cacheGroups: {
-				commons: {
-					name    : 'thirdParty',
-					test    : /[\\/]node_modules[\\/]/,
-					chunks  : 'initial',
-					priority: -10,
-					enforce : true
-				},
-				components: {
-					name  : 'components',
-					test  : /common\/|components\//,
-					chunks  : 'all',
-					enforce : true
-				},
-				styles: {
-					name   : 'main',
-					test   : /[\\/]main.scss[\\/]/,
-					chunks : 'all',
-					enforce: true,
-				}
-			}
-		}
-	},
+    optimization: {
+        sideEffects: false,
+        splitChunks: {
+            chunks     :'all',
+            minSize    : 30000,
+            minChunks  : 1,
+            cacheGroups: {
+                commons: {
+                    name    : 'thirdParty',
+                    test    : /[\\/]node_modules[\\/]/,
+                    chunks  : 'initial',
+                    priority: -10,
+                    enforce : true
+                },
+                components: {
+                    name  : 'components',
+                    test  : /common\/|components\//,
+                    chunks  : 'all',
+                    enforce : true
+                },
+                styles: {
+                    name   : 'main',
+                    test   : /[\\/]main.scss[\\/]/,
+                    chunks : 'all',
+                    enforce: true,
+                }
+            }
+        }
+    },
 
-	performance: {
-		hints: false
-	},
+    performance: {
+        hints: false
+    },
 
-	plugins: [
-		new webpack.DllReferencePlugin({
-			context : project.basePath,
-			manifest: path.resolve(project.basePath, '../dll', 'manifest.json')
-		}),
+    plugins: [
+        new webpack.DllReferencePlugin({
+            context : project.basePath,
+            manifest: path.resolve(project.basePath, '../dll', 'manifest.json')
+        }),
 
-		new HtmlWebpackPlugin({
-			template : 'src/index.html',
-			inject   : true,
-			favicon  : path.resolve('favicon.ico'),
-			minify   : {
-				collapseWhitespace: envDev? false : true,
-				ignoreCustomComments: envDev ? false : [ /^!/ ]
-			}
-		}),
+        new CopyWebpackPlugin([{
+            from : path.join(project.basePath,'../dll'),
+            to   : path.join(project.basePath,'../dist','dll')
+        }]),
 
-		new VueLoaderPlugin()
-	],
+        new HtmlWebpackPlugin({
+            template : 'src/index.html',
+            inject   : true,
+            favicon  : path.resolve('favicon.ico'),
+            minify   : {
+                collapseWhitespace: envDev? false : true,
+                ignoreCustomComments: envDev ? false : [ /^!/ ]
+            }
+        }),
 
+        new MiniCssExtractPlugin({
+            filename: envDev? '[name].css': '[name].[chunkhash:5].css',
+            chunkFilename: envDev? '[id].css' : '[name].[chunkhash:5].css'
+        }),
+
+        new VueLoaderPlugin()
+    ],
 };
-
-if(envDev){
-	config.plugins.push(
-		new MiniCssExtractPlugin({
-			filename: '[name].css',
-			chunkFilename: '[id].css'
-		}),
-	)
-}
-
-if(envPro) {
-	config.plugins.push(
-		new MiniCssExtractPlugin({
-			filename: '[name].[hash].css',
-			chunkFilename: '[name].[hash].css'
-		}),
-		new CopyWebpackPlugin([{
-			from : path.join(project.basePath,'../dll'),
-			to   : path.join(project.basePath,'../dist','dll')
-		}]),
-
-		new HtmlWebpackPlugin({
-			minify   : {
-				collapseWhitespace: true,
-				ignoreCustomComments: [ /^!/ ]
-			}
-		})
-	)
-}
 
 module.exports = config;

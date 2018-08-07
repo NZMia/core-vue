@@ -5,9 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dll": "cross-env NODE_ENV=development webpack -p --config ./configs/webpack.dll.config.js",
-    "start": "cross-env NODE_ENV=development node bin/start",
+    "dll": "rimraf dll && cross-env NODE_ENV=development webpack -p --config ./configs/webpack.dll.config.js",
+    "start": "cross-env NODE_ENV=production node bin/start",
     "build": "npm run clean && cross-env NODE_ENV=development node ./bin/build.js",
+    "prod": "npm run clean && cross-env NODE_ENV=production node ./bin/build.js",
     "clean": "rimraf dist"
   },
   "repository": {
@@ -43,7 +44,10 @@
     "sass-loader": "^7.0.3",
     "style-loader": "^0.21.0",
     "url-loader": "^1.0.1",
+    "vue-html-loader": "^1.2.4",
     "vue-loader": "^15.2.4",
+    "vue-style-loader": "^4.1.1",
+    "vue-template-compiler": "^2.5.17",
     "webpack": "^4.12.1",
     "webpack-cli": "^3.0.8",
     "webpack-dev-middleware": "^3.1.3",
@@ -52,15 +56,8 @@
     "webpack-merge": "^4.1.3"
   },
   "dependencies": {
-    "@babel/preset-env": "^7.0.0-beta.51",
-    "express": "^4.16.3",
-    "hoek": "^5.0.3",
-    "react": "^16.4.1",
-    "react-dom": "^16.4.1",
-    "react-router-dom": "^4.3.1",
-    "vue": "^2.5.16",
-    "vue-router": "^3.0.1",
-    "vue-template-compiler": "^2.5.16"
+    "vue": "^2.5.17",
+    "vue-router": "^3.0.1"
   },
   "bugs": {
     "url": "https://github.com/NZMia/core-vue/issues"

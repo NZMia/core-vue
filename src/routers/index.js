@@ -1,16 +1,17 @@
-import App from '../App.vue'
+import Router from 'vue-router'
+import Vue from 'Vue'
 
-const home = r => require.ensure([], () => r(require('../pages/home/index')), 'home')
+import Home from '../pages/home.vue';
+// const Home = () => import('../page/home.vue')
 
-export default [{
-	path: '/',
-	component: App,
-	children: [
-		{
-			path: '',
-			redirect: '/home'
-		}
-	]
+Vue.use(Router);
 
-}]
-
+export default new Router({
+    routes: [
+        {
+            path: '/index',
+            name: 'home',
+            component: Home
+        }
+    ]
+})
